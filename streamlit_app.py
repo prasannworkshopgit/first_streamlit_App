@@ -33,11 +33,21 @@ fruityvice_response=requests.get("https://fruityvice.com/api/fruit/"+fruit_choic
 fruityvice_normalized = pandas.json_normalize(fruityvice_response.json())
 streamlit.dataframe(fruityvice_normalized)
 
+
+import streamlit as st
 import snowflake.connector
-my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
-my_cur = my_cnx.cursor()
-my_cur.execute("SELECT CURRENT_USER(PRASANNPATIL), CURRENT_ACCOUNT('HL31229'.'Canada (Central)'.'Amazon Web Services'), CURRENT_REGION(Amazon Web Services)")
-my_data_row = my_cur.fetchone()
-streamlit.text("Hello from Snowflake:")
-streamlit.text(my_data_row)
+def init_connection():
+    return snowflake.connector.connect(
+        **st.secrets["snowflake"], client_session_keep_alive=True
+    )
+
+conn = init_connection()
+def run_query(query):
+    with conn.cursor() as cur:
+        cur.execute(query)
+        return cur.fetchall()
+
+rows = run_query("SELECT * from mytable;")
+for row in rows:
+    st.write(f"{row[0]} has a :{row[1]}:")
 
