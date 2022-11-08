@@ -1,2 +1,2 @@
-#rewuirements.txt
+#requirements.txt
 snowflake-connector-python
